@@ -69,11 +69,11 @@ public class ResTableTypeSpec {
         return "ResTableTypeSpec{" +
                 "chunkHeader=" + chunkHeader +
                 ", id=" +  Integer.toHexString(id & 0xFF) +
-                ", res0=" + res0 +
-                ", res1=" + res1 +
+//                ", res0=" + res0 +
+//                ", res1=" + res1 +
                 ", entryCount=" + entryCount +
                 ", resTableTypes=" + resTableTypes +
-                ", spec=" + Arrays.toString(spec) +
+                ", spec size=" + spec.length +
                 '}';
     }
 }

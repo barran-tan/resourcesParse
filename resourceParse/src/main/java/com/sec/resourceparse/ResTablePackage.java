@@ -60,7 +60,7 @@ public class ResTablePackage {
         return "ResTablePackage{" +
                 "chunkHeader=" + chunkHeader +
                 ", id=" + Integer.toHexString(id) +
-                ", name=" + Arrays.toString(name) +
+                ", name=" + ParseUtils.charToString(name) +
                 ", typeStrings=" + typeStrings +
                 ", lastPublicType=" + lastPublicType +
                 ", keyStrings=" + keyStrings +
@@ -68,6 +68,5 @@ public class ResTablePackage {
                 ", typeIdOffset=" + typeIdOffset +
                 '}';
     }
-
 
 }

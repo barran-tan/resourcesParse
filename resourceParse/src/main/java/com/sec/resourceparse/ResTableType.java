@@ -140,14 +140,35 @@ public class ResTableType {
     public String toString() {
         return "ResTableType{" +
                 "chunkHeader=" + chunkHeader +
-                ", id=" + Integer.toHexString(id & 0xFF) +
-                ", flags=" + flags +
-                ", reserved=" + reserved +
+                ", id=" + Integer.toHexString(id) +
+//                ", flags=" + flags +
+//                ", reserved=" + reserved +
                 ", entryCount=" + entryCount +
                 ", entriesStart=" + entriesStart +
-//                ", resConfig=" + resConfig.toString() +
-                ", entrys=" + Arrays.toString(getHexValue()) +
-                ", resTableEntries=" + resTableEntries +
+                ", resConfig=" + resConfig.toString() +
+//                ", entrys=" + Arrays.toString(getHexValue()) +
+                ", entrys size=" + entrys.length +
+                ", resTableEntries=" + tableEntriesString() +
                 '}';
+    }
+
+    private String tableEntriesString() {
+        int size = resTableEntries.size();
+        if (size == 0) {
+            return "{emtpy entries}";
+        }
+        int index = 0;
+        int count = 0;
+        int i = 0;
+        while (i < size) {
+            if (resTableEntries.get(i) != null) {
+                count++;
+                if (index == 0) {
+                    index = i;
+                }
+            }
+            i++;
+        }
+        return "{size=" + size + ",non_null_count=" + count + "," + index + "=" + resTableEntries.get(index).toString() + "}";
     }
 }

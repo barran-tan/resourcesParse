@@ -56,9 +56,64 @@ public class ResChunkHeader {
     @Override
     public String toString() {
         return "ResChunkHeader{" +
-                "type=" + type +
+                "type=" + typeString() +
                 ", headerSize=" + headerSize +
                 ", size=" + size +
                 '}';
+    }
+
+    private String typeString(){
+        String typeStr;
+        switch (type){
+            case RES_NULL_TYPE:
+                typeStr = "null";
+                break;
+            case RES_STRING_POOL_TYPE:
+                typeStr = "string_pool";
+                break;
+            case RES_TABLE_TYPE:
+                typeStr = "table";
+                break;
+            case RES_XML_TYPE:
+                typeStr = "xml";
+                break;
+//            case RES_XML_FIRST_CHUNK_TYPE:
+            case RES_XML_START_NAMESPACE_TYPE:
+                typeStr = "first_chunk|start_namespace";
+                break;
+            case RES_XML_END_NAMESPACE_TYPE:
+                typeStr = "end_namespace";
+                break;
+            case RES_XML_START_ELEMENT_TYPE:
+                typeStr = "start_element";
+                break;
+            case RES_XML_END_ELEMENT_TYPE:
+                typeStr = "end_element";
+                break;
+            case RES_XML_CDATA_TYPE:
+                typeStr = "xml_cdata";
+                break;
+            case RES_XML_LAST_CHUNK_TYPE:
+                typeStr = "last_chunk";
+                break;
+            case RES_XML_RESOURCE_MAP_TYPE:
+                typeStr = "xml_resource_map";
+                break;
+            case RES_TABLE_PACKAGE_TYPE:
+                typeStr = "table_package";
+                break;
+            case RES_TABLE_TYPE_TYPE:
+                typeStr = "table_type";
+                break;
+            case RES_TABLE_TYPE_SPEC_TYPE:
+                typeStr = "table_type_spec";
+                break;
+            case RES_TABLE_LIBRARY_TYPE:
+                typeStr = "table_library";
+                break;
+            default:
+                typeStr = "unknown";
+        }
+        return typeStr + "(" + type + ")";
     }
 }

@@ -26,7 +26,7 @@ public class ParseUtils {
     public static void parseResTable(ByteBuffer byteBuffer, ResTableHeader resTableHeader) {
         resTableHeader.chunkHeader = parseResChunkHeader(byteBuffer);
         resTableHeader.packageCount = byteBuffer.getInt();
-        System.out.println(resTableHeader.toString());
+        System.out.println(resTableHeader);
     }
 
     public static void parseStringPool(ByteBuffer buffer, ResStringPoolHeader resStringPoolHeader)  {
@@ -37,7 +37,7 @@ public class ParseUtils {
         resStringPoolHeader.flags = buffer.getInt();
         resStringPoolHeader.stringsStart = buffer.getInt();
         resStringPoolHeader.stylesStart = buffer.getInt();
-        System.out.println(resStringPoolHeader.toString());
+        System.out.println(resStringPoolHeader);
 
         /******************parse string index pool***************************/
         int[] stringIndexAry = new int[resStringPoolHeader.stringCount];
@@ -51,6 +51,7 @@ public class ParseUtils {
         }
 
         /******************parse string pool*****************************/
+        System.out.println("----start parse string pool");
         int index = 0;
         ArrayList<String> strings = new ArrayList<>();
         int stringPoolOffset = position + resStringPoolHeader.stringsStart;
@@ -70,13 +71,13 @@ public class ParseUtils {
                     value = new String(data, StandardCharsets.UTF_16LE);
                 }
                 strings.add(value);
-                System.out.println("---------value ==" + value + "---index:" + index);
+//                System.out.println("---------value ==" + value + "---index:" + index);
             }
             index++;
         }
-
+        System.out.println("----end parse string pool index=" + index);
         /********************parse string style****************************/
-        System.out.println("start parse string style");
+        System.out.println("----start parse string style");
         int stringPoolStyleOffset = position + resStringPoolHeader.stylesStart;
         ArrayList<ResStringPoolStyle> stringPoolStyles = new ArrayList<>();
         for (int i=0; i<styleIndexAry.length; i++) {
@@ -85,6 +86,7 @@ public class ParseUtils {
             resStringPoolStyle.parseResStringPoolStyle(buffer);
             stringPoolStyles.add(resStringPoolStyle);
         }
+        System.out.println("----end parse string style");
     }
 
     public static void parseResTablePackage(ByteBuffer byteBuffer, ResTablePackage resTablePackage) {
@@ -99,7 +101,7 @@ public class ParseUtils {
         resTablePackage.keyStrings = byteBuffer.getInt();
         resTablePackage.lastPublicKey = byteBuffer.getInt();
         resTablePackage.typeIdOffset = byteBuffer.getInt();
-        System.out.println(resTablePackage.toString());
+        System.out.println(resTablePackage);
 
         ResStringPoolHeader typeStringPool  = new ResStringPoolHeader();
         byteBuffer.position(position + resTablePackage.typeStrings);
@@ -122,11 +124,40 @@ public class ParseUtils {
         while (position < byteBuffer.capacity()) {
             byteBuffer.position(position);
             ResChunkHeader chunkHeader = parseResChunkHeader(byteBuffer);
-            if (chunkHeader.type == ResChunkHeader.RES_TABLE_TYPE_SPEC_TYPE) {
-                parseResTableTypeSpec(byteBuffer, chunkHeader);
-            } else {
-                ResTableType resTableType = parseResTableType(byteBuffer, chunkHeader);
-                System.out.println(resTableType.toString());
+            switch (chunkHeader.type){
+                case ResChunkHeader.RES_TABLE_TYPE_SPEC_TYPE:
+                    if (chunkHeader.size > chunkHeader.headerSize) {
+                        parseResTableTypeSpec(byteBuffer, chunkHeader);
+                    } else {
+                        System.out.println("!!!!empty content in " + chunkHeader);
+                    }
+                    break;
+                case ResChunkHeader.RES_TABLE_TYPE_TYPE:
+                    if (chunkHeader.size > chunkHeader.headerSize) {
+                        try {
+                            ResTableType resTableType = parseResTableType(byteBuffer, chunkHeader);
+                            System.out.println(resTableType);
+                        } catch (Exception e) {
+                            break;
+                        }
+                    } else {
+                        System.out.println("!!!!empty content in " + chunkHeader);
+                    }
+                    break;
+                    // 这里是适配多ResTablePackage的case
+                case ResChunkHeader.RES_TABLE_PACKAGE_TYPE:
+                    if (chunkHeader.size > chunkHeader.headerSize) {
+                        // 由于前面parseResTablePackage里面会重复读取chunkHeader，这里回退下position
+                        byteBuffer.position(position);
+                        parseResTablePackage(byteBuffer, new ResTablePackage());
+                    } else {
+                        System.out.println("!!!!empty content in " + chunkHeader);
+                    }
+                    break;
+                default:
+                    // TODO 这里还可能有RES_TABLE_LIBRARY_TYPE，暂时没有处理
+                    System.out.println("parseResTableType unknown type " + chunkHeader.type);
+                    break;
             }
             position = position + chunkHeader.size;
         }
@@ -140,7 +171,7 @@ public class ParseUtils {
         resTableTypeSpec.res1 = byteBuffer.getShort();
         resTableTypeSpec.entryCount = byteBuffer.getInt();
         resTableTypeSpec.parseSpecArr(byteBuffer);
-        System.out.println(resTableTypeSpec.toString());
+        System.out.println(resTableTypeSpec);
     }
 
 
@@ -166,4 +197,24 @@ public class ParseUtils {
         return resChunkHeader;
     }
 
+    public static String charToString(char[] chars) {
+        int index = chars.length - 1;
+        while (index >= 0) {
+            if (chars[index] == 0) {
+                index--;
+            } else {
+                break;
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i <= index; i++) {
+            if (chars[i] != 0) {
+                sb.append(chars[i]);
+            }
+        }
+        if (sb.length() == 0) {
+            sb.append("[empty]");
+        }
+        return sb.toString();
+    }
 }

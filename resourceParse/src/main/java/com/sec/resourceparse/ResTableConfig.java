@@ -487,4 +487,15 @@ public class ResTableConfig {
     public void parse(ByteBuffer byteBuffer) {
         size = byteBuffer.getInt();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ResTableConfig{");
+        sb.append("size=" + size);
+//        sb.append(",language=" + ParseUtils.charToString(language));
+//        sb.append(",country=" + ParseUtils.charToString(country));
+//        sb.append(",density=" + density);
+        sb.append("}");
+        return sb.toString();
+    }
 }

@@ -1,0 +1,8 @@
+ 
+.idea/
+res_parse_output.txt
+resourceParse/.gradle/
+resourceParse/.idea/
+resourceParse/local.properties
+resourceParse/res_parse_output.txt
+resources.arsc
